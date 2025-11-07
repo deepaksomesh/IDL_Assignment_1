@@ -1,0 +1,4 @@
+run_id,dataset,config,test_accuracy
+cnn_elu_rmsprop_glorot_uniform_None_64x128,cifar10,"{'filters': [64, 128], 'kernel': 3, 'activation': 'elu', 'regularizer': None, 'dropout': 0.3, 'optimizer': 'rmsprop', 'initializer': 'glorot_uniform'}",0.678600013256073
+cnn_relu_adam_glorot_uniform_l2_32x64x128,cifar10,"{'filters': [32, 64, 128], 'kernel': 3, 'activation': 'relu', 'regularizer': 'l2', 'reg_value': 0.0001, 'dropout': 0.4, 'optimizer': 'adam', 'initializer': 'glorot_uniform'}",0.7372000217437744
+cnn_relu_sgd_glorot_uniform_None_32x64,cifar10,"{'filters': [32, 64], 'kernel': 3, 'activation': 'relu', 'regularizer': None, 'dropout': 0.3, 'optimizer': 'sgd', 'initializer': 'glorot_uniform'}",0.7153000235557556
