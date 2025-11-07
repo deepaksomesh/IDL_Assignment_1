@@ -1,0 +1,58 @@
+[
+  {
+    "run_id": "cnn_elu_rmsprop_glorot_uniform_None_64x128",
+    "dataset": "fmnist",
+    "config": {
+      "filters": [
+        64,
+        128
+      ],
+      "kernel": 3,
+      "activation": "elu",
+      "regularizer": null,
+      "dropout": 0.3,
+      "optimizer": "rmsprop",
+      "initializer": "glorot_uniform"
+    },
+    "best_val_accuracy": 0.9401666522026062,
+    "final_test_accuracy": 0.9269999861717224
+  },
+  {
+    "run_id": "cnn_relu_adam_glorot_uniform_l2_32x64x128",
+    "dataset": "fmnist",
+    "config": {
+      "filters": [
+        32,
+        64,
+        128
+      ],
+      "kernel": 3,
+      "activation": "relu",
+      "regularizer": "l2",
+      "reg_value": 0.0001,
+      "dropout": 0.4,
+      "optimizer": "adam",
+      "initializer": "glorot_uniform"
+    },
+    "best_val_accuracy": 0.9386666417121887,
+    "final_test_accuracy": 0.9204000234603882
+  },
+  {
+    "run_id": "cnn_relu_sgd_glorot_uniform_None_32x64",
+    "dataset": "fmnist",
+    "config": {
+      "filters": [
+        32,
+        64
+      ],
+      "kernel": 3,
+      "activation": "relu",
+      "regularizer": null,
+      "dropout": 0.3,
+      "optimizer": "sgd",
+      "initializer": "glorot_uniform"
+    },
+    "best_val_accuracy": 0.9383333325386047,
+    "final_test_accuracy": 0.929099977016449
+  }
+]
