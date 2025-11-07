@@ -11,6 +11,7 @@ from tensorflow.keras.callbacks import (EarlyStopping, ModelCheckpoint,
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
+# Setting random seeds for reproduciility and logging
 def set_seed(seed=42):
     np.random.seed(seed)
     random.seed(seed)
@@ -19,6 +20,9 @@ set_seed(42)
 
 for p in ["results", "results/models", "results/logs", "results/summaries"]:
     os.makedirs(p, exist_ok=True)
+
+# The helper functions for Regularizers, Initializers, Optimizers,
+# and Keras Callbacks for early stopping and logging
 
 def get_regularizer(cfg):
     if cfg.get("regularizer") == "l1":
@@ -52,6 +56,9 @@ def callbacks_for(run_id):
                           patience=3, min_lr=1e-6)
     ]
 
+# Just another helper functions to make summaries and custom naming of model runid
+# with configurations to keep track of all the runs.
+
 def summarize_run(run_id, dataset, cfg, hist, test_acc):
     best_val_acc = max(hist.history.get("val_accuracy", [0.0]))
     summary = {
@@ -66,7 +73,6 @@ def summarize_run(run_id, dataset, cfg, hist, test_acc):
     return summary
 
 def make_run_id(model_type, cfg):
-    """Generate descriptive run_id from config"""
     act = cfg.get("activation", "relu")
     opt = cfg.get("optimizer", "adam")
     init = cfg.get("initializer", "glorot_uniform")
@@ -77,7 +83,8 @@ def make_run_id(model_type, cfg):
     reg = cfg.get("regularizer", "none")
     return f"{model_type}_{act}_{opt}_{init}_{reg}_{arch}"
 
-# Fashion MNIST
+# Loading and preprocessing of Fashion-MNIST dataset
+
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
 x_train, x_test = x_train.astype("float32") / 255.0, x_test.astype("float32") / 255.0
 
@@ -93,6 +100,7 @@ x_train_cnn = x_train_cnn[..., np.newaxis]
 x_val_cnn = x_val_cnn[..., np.newaxis]
 x_test_cnn = x_test[..., np.newaxis]
 
+# Both CNN and MLP architectures with softmax activation and sparse_categorical_crossentropy
 
 def build_mlp(cfg):
     model = Sequential()
@@ -134,6 +142,9 @@ def build_cnn(cfg, input_shape=(28,28,1)):
                   metrics=["accuracy"])
     return model
 
+# Different sets of hyperparameter configurations for MLP
+# and CNN with combination of optimizers, and initializers
+
 base_mlp_configs = [
     {"layers":[256,128], "activation":"relu","regularizer":None,"dropout":0.2},
     {"layers":[512,256,128], "activation":"relu","regularizer":"l2","reg_value":1e-4,"dropout":0.3},
@@ -165,6 +176,8 @@ for base in base_cnn_configs:
             cfg.update({"optimizer": opt, "initializer": init})
             cnn_configs.append(cfg)
 
+# Training on MLP and CNN models for Fashion-MNIST and storing the results and CSV
+
 summaries = []
 
 for cfg in mlp_configs:
@@ -191,6 +204,7 @@ for cfg in cnn_configs:
 
 pd.DataFrame(summaries).to_csv("results/fmnist_summary.csv", index=False)
 
+# Visualizing the validation accuracy for all configurations and stored the results
 
 df = pd.DataFrame(summaries)
 df_sorted = df.sort_values("best_val_accuracy", ascending=False).reset_index(drop=True)
@@ -207,13 +221,13 @@ plt.tight_layout()
 plt.savefig("results/fmnist_all_configs_lineplot.png", dpi=150)
 plt.close()
 
-# Save top-10 JSON summary (still useful)
 top10 = df_sorted.head(10)
 top3 = top10.head(3).to_dict(orient="records")
 with open("results/top3_fmnist.json", "w") as f:
     json.dump(top3, f, indent=2)
 
-# transfer learning on CIFAR10 dataset
+# Retraining the CIFAR-10 dataset with top-3 architectures with hyperparameters in Fashion-MNiST dataset
+
 (x_train_c, y_train_c), (x_test_c, y_test_c) = tf.keras.datasets.cifar10.load_data()
 y_train_c, y_test_c = y_train_c.flatten(), y_test_c.flatten()
 x_train_c, x_test_c = x_train_c.astype("float32") / 255.0, x_test_c.astype("float32") / 255.0
@@ -223,7 +237,7 @@ x_train_c, x_val_c, y_train_c, y_val_c = train_test_split(
 
 retrain_results = []
 
-print("\n=== Retraining top-3 Fashion-MNIST models from scratch on CIFAR-10 ===")
+print("\nRetraining top-3 Fashion-MNIST models on CIFAR-10")
 
 for info in top3:
     run_id, cfg = info["run_id"], info["config"]
@@ -261,7 +275,6 @@ for info in top3:
             "test_accuracy": float(test_acc)
         })
 
-# Save CIFAR-10 results
 pd.DataFrame(retrain_results).to_csv("results/cifar10_summary.csv", index=False)
 
 # Comparison plot (FMNIST vs CIFAR-10)
@@ -273,10 +286,9 @@ if not merged.empty:
     plt.xticks(rotation=45, ha="right")
     plt.ylabel("Test Accuracy")
     plt.legend()
-    plt.title("Top-3 Model Performance: Fashion-MNIST vs CIFAR-10 (No Transfer Learning)")
+    plt.title("Top-3 Model Performance: Fashion-MNIST vs CIFAR-10")
     plt.tight_layout()
     plt.savefig("results/fmnist_cifar10_comparison.png", dpi=150)
     plt.close()
 
-print("\nDone retraining top-3 models on CIFAR-10!")
 print("\n Done mate!!!!!!")
