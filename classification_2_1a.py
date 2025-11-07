@@ -19,15 +19,14 @@ print("Loading data...")
 images = np.load("images.npy")
 labels = np.load("labels.npy")
 
-# Convert labels to total minutes [0,720)
+# Converting labels to total minutes [0,720)
 hours = labels[:, 0] % 12
 minutes = labels[:, 1]
 total_minutes = (hours * 60 + minutes).astype(int)
 
-# Normalize pixel values
+# Normalizing pixel values
 images = images.astype("float32") / 255.0
 
-# Add channel dimension if missing
 if len(images.shape) == 3:
     images = images[..., np.newaxis]
 
